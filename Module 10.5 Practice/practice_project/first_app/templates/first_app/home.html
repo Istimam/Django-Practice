@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- add Templete Filter -->
+    <h1>Quantity of added Bangla Books: {{ d.books.0.quantity | add:"2" }}</h1> <br>
+    <!-- or -->
+    {% with quantity=d.books.0.quantity %}
+        <h1>Quantity of added Bangla Books: {{ quantity | add:"2" }}</h1>
+    {% endwith %}
+
+    <!-- addslashes Template Filter-->
+    <h1>{{ d.hobby | addslashes }}</h1>
+    <!-- calfirst Template Filter -->
+    <h1>{{ d.name | capfirst }}</h1>
+    <!-- center Template Filter -->
+    <h1>{{ d.name | center:"15" }}</h1>
+    <!-- cut Template Filter -->
+    <h1>{{ d.name | cut:"w" }}</h1>
+    <!-- dictsort Template Filter -->
+    <h1>{{d.books.0.author.age}} </h1>
+    {% for book in d.books|dictsortreversed:"author.age" %}
+        <h1>{{ book }}</h1>
+    {% endfor %}
+    <!-- File size Format Template Filter -->
+    <h1>{{ d.books.0.fileSize | filesizeformat }}</h1>
+    <!-- first Template Filter -->
+    <h1>{{ dict.letter | first }}</h1>
+    <h1>{{ dict.letter | length }}</h1>
+    <h1>{{ d.name | lower }}</h1>
+    <h1>{{ d.name | upper }}</h1>
+    <h1>{{ d.name | make_list }}</h1>
+    <!-- timesince -->
+    <h1>Taylors age: {{ d.dob | timesince}} </h1>
+    <h1>{{ d.age | add:"5" }}</h1>
+    <h1>{{ d.name | truncatewords:1 }}</h1>
+    <h1>My age {{ d.age }} year{{ d.age | pluralize}} old.</h1>
+
+</body>
+</html>
