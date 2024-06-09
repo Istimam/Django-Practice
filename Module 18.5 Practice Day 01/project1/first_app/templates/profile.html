@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="height: auto; width: 50%; margin: auto;">
+    <h1>This is {{user}}'s profile page</h1>
+<a href="{% url 'passchange' %}"><button class="btn btn-warning m-3">Change Password</button></a>
+<br/>
+<a href="{% url 'passchangew'%}"><button class="btn btn-danger mx-3">Change Password Without Old Password</button></a>
+</div>
+
+
+{% endblock %}

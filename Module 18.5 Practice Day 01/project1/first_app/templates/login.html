@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div style="height: auto; width: 50%; margin: auto;">
+    <h1>This is login page</h1>
+</div>
+<form method="post" style="height: auto; width: 50%; margin: auto;">
+    {% csrf_token %}
+    <!-- {% if form.non_field_errors %}
+    {% for er in form.non_field_errors %}
+        <p class="bg-danger text-white pd-3">{{er}}</p>
+    {% endfor %}
+    {% endif %} -->
+    {{form|crispy}}
+    <button class="btn btn-primary">Login</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+{% if request.user.is_authenticated %}
+<h1 class="text-center text-warning">Are you sure, you want to logout?</h1>
+<div style="margin-top: 30px; align-items: center;">
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Logout.</button>
+    </form>
+</div>
+{% else %}
+    <h1>You are not logged in. Would You like to <a href="{% url 'login' %}">Login</a></h1>
+{% endif %}
+{% endblock %}
