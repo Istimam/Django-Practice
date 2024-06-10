@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% if request.user.is_authenticated %}
-<h1 class="text-center text-warning">Are you sure, you want to logout?</h1>
-<div style="margin-top: 30px; align-items: center;">
+<h1 class="text-center text-warning mt-4">Are you sure, you want to logout?</h1>
+<div class="d-flex justify-content-center align-items-center mt-4">
     <form method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Yes, Logout.</button>

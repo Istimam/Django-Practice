@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
+from django.http import HttpResponseRedirect
 # Create your views here.
 class SignupForm(CreateView):
     model = User
@@ -44,15 +45,13 @@ class Loginview(LoginView):
         context['type'] = 'Login'
         return context
 
-# @method_decorator(login_required, name='dispatch')
 # class Logoutview(LogoutView):
-#     def get_success_url(self):
-#         return reverse_lazy('homepage')
-#     def dispatch(self, request, *args, **kwargs):
-#         response = super().dispatch(request, *args, **kwargs)
-#         messages.success(request, 'You have been logged out successfully.')
-#         return response
-    
+#     template_name = 'logout.html'
+#     login_url = 'login'
+#     def post(self,request, *args, **kwargs):
+#         logout(request)
+#         messages.add_message(request, messages.SUCCESS, 'You have been logged out successfully.')
+#         return HttpResponseRedirect(reverse_lazy('login'))
 
 def Logoutview(request):
     if request.method == 'POST':
