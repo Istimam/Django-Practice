@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}{% endblock %}
+    <title>Mamar Bank</title>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.0.1/dist/tailwind.min.css">
+    <style>
+        /* Ensure the page takes the full height of the viewport */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        /* Flexbox setup for sticky footer */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        /* Main content should take up available space */
+        .content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-indigo-600">
+    {% include 'navbar.html' %}
+    <div class="content lg:container lg:mx-auto">
+        {% include 'messages.html' %}
+        {% block body %}
+        {% endblock %}
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>
