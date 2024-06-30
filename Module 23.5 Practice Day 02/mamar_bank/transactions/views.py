@@ -1,8 +1,10 @@
+from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404, redirect
+from django.core.mail import EmailMultiAlternatives
+from accounts.models import UserBankAccount, BankStatus
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from datetime import datetime
-from accounts.models import UserBankAccount, BankStatus
 from django.contrib import messages
 from django.http import HttpResponse
 from django.views.generic import CreateView, ListView, View, FormView
@@ -31,6 +33,21 @@ class TransactionCreateMixin(LoginRequiredMixin, CreateView):
         })
         return context
     
+def send_transaction_mail(user, amount, subject, template, **kwargs):
+    mail_subject = "Deposite Message"
+    # message = render_to_string(template,{
+    #     'user': user,
+    #     'amount': amount,
+    # })
+    context = {
+        'user': user,
+        'amount': amount,
+    }
+    context.update(kwargs)
+    message = render_to_string(template, context)
+    send_mail = EmailMultiAlternatives(subject,'','nasrullah9867@gmail.com', to=[user.email])
+    send_mail.attach_alternative(message, "text/html")
+    send_mail.send()
 
 class DepositMoneyView(TransactionCreateMixin):
     form_class = DepositeForm
@@ -54,6 +71,9 @@ class DepositMoneyView(TransactionCreateMixin):
             update_fields=['balance']
         )
         messages.success(self.request, f"{amount}$ was deposited to you account")
+        # sending email to user when deposited
+        send_transaction_mail(self.request.user, amount, "Deposite Message", "transactions/deposite_message.html")
+
         return super().form_valid(form)
     
 class WithdrawMoneyView(TransactionCreateMixin):
@@ -66,12 +86,11 @@ class WithdrawMoneyView(TransactionCreateMixin):
     
     def form_valid(self, form):
         account = self.request.user.account
-
+        
         bank_status = BankStatus.objects.first()
         if bank_status and bank_status.is_bankrupt:
             messages.error(self.request, "Bank is currently bankrupt. Transactions are disabled.")
             return redirect('homepage')
-        
         
         amount = form.cleaned_data.get('amount')
         account.balance -= amount # user er kase ase 500 WITHDRAWAL 500 so current amount is 0
@@ -79,6 +98,7 @@ class WithdrawMoneyView(TransactionCreateMixin):
             update_fields=['balance']
         )
         messages.success(self.request, f"Successfuly withdrawn {amount}$ from your account")
+        send_transaction_mail(self.request.user, amount, "Withdrawl Message", "transactions/withdrawl_message.html")
         return super().form_valid(form)
     
 class LoanRequestView(TransactionCreateMixin):
@@ -90,7 +110,6 @@ class LoanRequestView(TransactionCreateMixin):
         return initial
     
     def form_valid(self, form):
-
         bank_status = BankStatus.objects.first()
         if bank_status and bank_status.is_bankrupt:
             messages.error(self.request, "Bank is currently bankrupt. Transactions are disabled.")
@@ -101,6 +120,7 @@ class LoanRequestView(TransactionCreateMixin):
         if current_loan_count >= 3:
             return HttpResponse("Loan request crossed limits")
         messages.success(self.request, f"Successfuly loan request sent about only {amount}$")
+        send_transaction_mail(self.request.user, amount, "Loan Request Message", "transactions/loan_request_message.html")
         return super().form_valid(form)
     
 class TransactionReportView(LoginRequiredMixin, ListView):
@@ -144,6 +164,9 @@ class PayLoanView(LoginRequiredMixin, View):
                 user_account.save()
                 loan.transaction_type = LOAN_PAID
                 loan.save()
+
+                send_transaction_mail(self.request.user, loan.amount, "Loan Payment Message", "transactions/loan_pay_message.html")
+
                 return redirect('loan_list')
             else:
                 messages.error(request, "Insufficient balance for loan payment")
@@ -201,6 +224,20 @@ class TransferView(LoginRequiredMixin, FormView):
                 balance_after_transaction = recipient_account.balance,
             )
             messages.success(self.request, f"Transferred {amount}$ to account {recipient_account.account_no}")
+            # sending email to both user when money sent
+            send_transaction_mail(
+                from_account.user, 
+                amount, 'Send Money', 
+                'transactions/send_money.html',to_username=recipient_account.user.username)
+            
+            send_transaction_mail(
+                recipient_account.user,
+                amount,
+                'Money Received',
+                'transactions/receive_money.html',
+                to_email=recipient_account.user.email,
+                from_username=from_account.user.username
+            )
         else:
             messages.error(self.request, "Insufficient balance.")
         return redirect(self.success_url)
@@ -208,4 +245,3 @@ class TransferView(LoginRequiredMixin, FormView):
     def form_invalid(self, form):
         messages.error(self.request, "There was an error processing your request.")
         return super().form_invalid(form)
-    
