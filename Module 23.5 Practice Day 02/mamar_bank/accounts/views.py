@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
 from django.contrib import messages
 from .forms import UserRegistrationForm, UserUpdateForm, CustomPasswordChangeForm
@@ -52,9 +53,9 @@ class UserProfileView(View):
         return render(request, self.template_name, context)     
 
 
-class UserBankAccountUpdateView(View):
+class UserBankAccountUpdateView(LoginRequiredMixin, View):
     template_name = 'accounts/update_profile.html'
-
+    login_url = 'login'
     def get(self, request):
         user = request.user
         user_bank_account = UserBankAccount.objects.get(user=user)
